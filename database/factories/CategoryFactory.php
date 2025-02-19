@@ -17,7 +17,14 @@ class CategoryFactory extends Factory
     public function definition(): array
     {
         return [
-            //
+            'name' => fake()->name(),
         ];
+    }
+
+    //this is to generate specific category
+    public function predefined($name): static{
+        return $this->state(fn () => [
+            'name' => $name,
+        ]);
     }
 }
