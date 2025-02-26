@@ -1,0 +1,1 @@
+<a href="{{ route($routeName) }}" class="{{ $smallScreen ? 'block text-base' : 'text-sm' }}  rounded-md font-medium px-3 py-2 {{ Route::is($routeName) ? 'bg-gray-900 text-white' : 'text-gray-300 hover:bg-gray-700 hover:text-white' }}">{{ $name }}</a>
