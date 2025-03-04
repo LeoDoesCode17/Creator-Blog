@@ -7,8 +7,8 @@
                 </div>
                 <div class="hidden md:block">
                     <div class="ml-10 flex items-baseline space-x-4">
-                        <livewire:nav-link name="Login" routeName="home" smallScreen="false"/>
-                        <livewire:nav-link name="Register" routeName="search" smallScreen="false"/>
+                        <livewire:nav-link name="Login" routeName="login" smallScreen="false"/>
+                        <livewire:nav-link name="Register" routeName="register" smallScreen="false"/>
                     </div>
                 </div>
             </div>
@@ -34,8 +34,8 @@
     <div x-show="displayed" class="md:hidden" id="mobile-menu">
         <div class="space-y-1 px-2 pt-2 pb-3 sm:px-3">
             <!-- Current: "bg-gray-900 text-white", Default: "text-gray-300 hover:bg-gray-700 hover:text-white" -->
-            <livewire:nav-link name="Login" routeName="home" smallScreen="true"/>
-            <livewire:nav-link name="Register" routeName="search" smallScreen="true"/>
+            <livewire:nav-link name="Login" routeName="login" smallScreen="true"/>
+            <livewire:nav-link name="Register" routeName="register" smallScreen="true"/>
         </div>
     </div>
 </nav>
