@@ -13,8 +13,8 @@
     <body>
         <div class="min-h-full">
             @if(auth()->check())
-                <livewire:nav-bar />
-                <livewire:header :title="$title ?? 'Page Title'"/>
+                @livewire('nav-bar')
+                @livewire('header', ['title' => $title ?? 'Page Title'])
             @else
                 @livewire('guest.guest-navbar')
             @endif
