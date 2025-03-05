@@ -2,6 +2,8 @@
 
 namespace App\Livewire\Auth;
 
+use App\Models\User;
+use Illuminate\Support\Facades\Auth;
 use Livewire\Attributes\Title;
 use Livewire\Component;
 
@@ -31,6 +33,16 @@ class RegisterPage extends Component
             'email' => 'required|email|max:255|unique:users',
             'password' => 'required|string|min:8|confirmed',
         ]);
+        
+        //create new user
+        User::create([
+            'name' => $this->name,
+            'username' => $this->username,
+            'email' => $this->email,
+            'password' => bcrypt($this->password)
+        ]);
+
+        session()->flash('success_registered', 'Success to register');
     }
 
     public function render()
