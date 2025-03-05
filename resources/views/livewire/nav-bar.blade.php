@@ -7,8 +7,8 @@
                 </div>
                 <div class="hidden md:block">
                     <div class="ml-10 flex items-baseline space-x-4">
-                        <livewire:nav-link name="Home" routeName="home" smallScreen="false"/>
-                        <livewire:nav-link name="Search" routeName="search" smallScreen="false"/>
+                        <livewire:nav-link name="Home" routeName="home" smallScreen="false" />
+                        <livewire:nav-link name="Search" routeName="search" smallScreen="false" />
                     </div>
                 </div>
             </div>
@@ -46,7 +46,11 @@
                             <!-- Active: "bg-gray-100 outline-hidden", Not Active: "" -->
                             <a href="{{ route('profile') }}" class="block px-4 py-2 text-sm text-gray-700" role="menuitem" tabindex="-1" id="user-menu-item-0">Your Profile</a>
                             <a href="{{ route('settings') }}" class="block px-4 py-2 text-sm text-gray-700" role="menuitem" tabindex="-1" id="user-menu-item-1">Settings</a>
-                            <a href="#" class="block px-4 py-2 text-sm text-gray-700" role="menuitem" tabindex="-1" id="user-menu-item-2">Sign out</a>
+                            <form method="POST" action="{{ route('logout') }}">
+                                @csrf
+                                <button type="submit" class="block px-4 py-2 text-sm text-gray-700"> Sign Out</button>
+                            </form>
+
                         </div>
                     </div>
                 </div>
@@ -73,8 +77,8 @@
     <div x-show="displayed" class="md:hidden" id="mobile-menu">
         <div class="space-y-1 px-2 pt-2 pb-3 sm:px-3">
             <!-- Current: "bg-gray-900 text-white", Default: "text-gray-300 hover:bg-gray-700 hover:text-white" -->
-            <livewire:nav-link name="Home" routeName="home" smallScreen="true"/>
-            <livewire:nav-link name="Search" routeName="search" smallScreen="true"/>
+            <livewire:nav-link name="Home" routeName="home" smallScreen="true" />
+            <livewire:nav-link name="Search" routeName="search" smallScreen="true" />
         </div>
         <div class="border-t border-gray-700 pt-4 pb-3">
             <div class="flex items-center px-5">
@@ -96,7 +100,10 @@
             <div class="mt-3 space-y-1 px-2">
                 <a href="{{ route('profile') }}" class="block rounded-md px-3 py-2 text-base font-medium text-gray-400 hover:bg-gray-700 hover:text-white">Your Profile</a>
                 <a href="{{ route('settings') }}" class="block rounded-md px-3 py-2 text-base font-medium text-gray-400 hover:bg-gray-700 hover:text-white">Settings</a>
-                <a href="#" class="block rounded-md px-3 py-2 text-base font-medium text-gray-400 hover:bg-gray-700 hover:text-white">Sign out</a>
+                <form method="POST" action="{{ route('logout') }}">
+                    @csrf
+                    <button type="submit" class="block rounded-md px-3 py-2 text-base font-medium text-gray-400 hover:bg-gray-700 hover:text-white"> Sign Out</button>
+                </form>
             </div>
         </div>
     </div>
