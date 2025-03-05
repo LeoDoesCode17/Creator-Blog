@@ -15,7 +15,7 @@ class RegisterPage extends Component
     public $username;
     public $email;
     public $password;
-    public $password_cnfirmation;
+    public $password_confirmation;
 
 
     public function register(){
@@ -43,6 +43,8 @@ class RegisterPage extends Component
         ]);
 
         session()->flash('success_registered', 'Success to register');
+
+        $this->reset();
     }
 
     public function render()
