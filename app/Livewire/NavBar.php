@@ -3,7 +3,6 @@
 namespace App\Livewire;
 
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Session;
 use Livewire\Component;
 
 class NavBar extends Component
@@ -14,10 +13,10 @@ class NavBar extends Component
         Auth::logout();
 
         //Destroy the current session because the old session id can still be used (session fixation attack risk)
-        Session::invalidate();
+        session()->invalidate();
 
         //Generate a new CSRF token because the old token can still be used (CSRF attack risk)
-        Session::regenerateToken();
+        session()->regenerateToken();
 
         //Redirect to loginn page
         return redirect()->route('login');
