@@ -13,7 +13,25 @@ class RegisterPage extends Component
     public $username;
     public $email;
     public $password;
-    public $passwordConfirmation;
+    public $password_cnfirmation;
+
+
+    public function register(){
+        // $data = [
+        //     'name' => $this->name,
+        //     'username' => $this->username,
+        //     'email' => $this->email,
+        //     'password' => $this->password,
+        //     'password_confirmation' => $this->passwordConfirmation,
+        // ];
+        // dd($data);
+        $this->validate([
+            'name' => 'required|string|max:255',
+            'username' => 'required|string|max:255|unique:users',
+            'email' => 'required|email|max:255|unique:users',
+            'password' => 'required|string|min:8|confirmed',
+        ]);
+    }
 
     public function render()
     {
