@@ -27,11 +27,19 @@ class RegisterPage extends Component
         //     'password_confirmation' => $this->passwordConfirmation,
         // ];
         // dd($data);
+
+        //this validation needs improvement
         $this->validate([
             'name' => 'required|string|max:255',
             'username' => 'required|string|max:255|unique:users',
             'email' => 'required|email|max:255|unique:users',
-            'password' => 'required|string|min:8|confirmed',
+            'password' => [
+                'required', 
+                'string', 
+                'min:8', 
+                'confirmed',
+                'regex:/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/'
+            ],
         ]);
         
         //create new user
