@@ -4,6 +4,13 @@
         <h2 class="mt-10 text-center text-2xl/9 font-bold tracking-tight text-gray-900">Register Your Account</h2>
     </div>
 
+    @if(session()->has('success_registered'))
+    <div class="bg-green-100 border-l-4 border-green-500 text-green-700 p-4 rounded-md" role="alert">
+        <p class="font-bold">Success!</p>
+        <p>{{ session('success_registered') }}</p>
+    </div>
+    @endif
+
     <div class="mt-10 sm:mx-auto sm:w-full sm:max-w-sm">
         <form class="space-y-6" wire:submit.prevent="register">
             <!-- Name Input -->
