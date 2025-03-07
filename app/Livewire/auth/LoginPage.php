@@ -18,7 +18,7 @@ class LoginPage extends Component
 
     protected $rules = [
         'identifier' => 'required',
-        'password' => 'required|min:8',
+        'password' => 'required',
     ];
 
     public function login(){
