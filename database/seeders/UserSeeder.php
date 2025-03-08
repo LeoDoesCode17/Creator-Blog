@@ -19,5 +19,6 @@ class UserSeeder extends Seeder
             'password' => bcrypt(env('MY_PASSWORD')),
             'username' => 'Creator09',
         ]);
+        User::factory()->count(4)->create();
     }
 }
