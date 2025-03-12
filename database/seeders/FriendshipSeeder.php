@@ -28,19 +28,19 @@ class FriendshipSeeder extends Seeder
             //make sure friendship doesn't exists in both direction
             $friendshipExists = Friendship::where(
                 function ($query) use($user, $friend){
-                    $query->where('user_id', $user->id)->where('friend_id', $friend->id);
+                    $query->where('sender_id', $user->id)->where('receiver_id', $friend->id);
                 }
             )->orWhere(
                 function ($query) use($user, $friend){
-                    $query->where('user_id', $friend->id)->where('friend_id', $user->id);
+                    $query->where('sender_id', $friend->id)->where('receiver_id', $user->id);
                 }
             )->exists();
 
             //if doesn't exist => create using factory
             if(!$friendshipExists){
                 Friendship::factory()->create([
-                    'user_id' => $user->id,
-                    'friend_id' => $friend->id
+                    'sender_id' => $user->id,
+                    'receiver_id' => $friend->id
                 ]);
             }
         }
