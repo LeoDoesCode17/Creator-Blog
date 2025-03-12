@@ -75,6 +75,6 @@ class User extends Authenticatable
     //get all the friends of a user
     public function getFriends(){
         //merge the two collections
-        return $this->sentFriendRequest()->merge($this->receivedFriendRequest());
+        return $this->sentFriendRequest->merge($this->receivedFriendRequest);
     }
 }
