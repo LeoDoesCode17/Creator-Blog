@@ -22,23 +22,31 @@
             </thead>
             <tbody>
                 @foreach ($users as $user)
-                    <tr>
-                        <td class="p-4 border-b border-blue-gray-50">
-                            <p class="block font-sans text-sm antialiased font-normal leading-normal text-blue-gray-900">
-                                {{ $user->name }}
-                            </p>
-                        </td>
-                        <td class="p-4 border-b border-blue-gray-50">
-                            <p class="block font-sans text-sm antialiased font-normal leading-normal text-blue-gray-900">
-                                {{ $user->username }}
-                            </p>
-                        </td>
-                        <td class="p-4 border-b border-blue-gray-50">
-                            <a href="#" class="block font-sans text-sm antialiased font-medium leading-normal text-blue-gray-900 hover:underline">
-                                Add Friend
-                            </a>
-                        </td>
-                    </tr>
+                    @if(auth()->user()->getFriendshipStatus($user) !== 'blocked')
+                        <tr>
+                            <td class="p-4 border-b border-blue-gray-50">
+                                <p class="block font-sans text-sm antialiased font-normal leading-normal text-blue-gray-900">
+                                    {{ $user->name }}
+                                </p>
+                            </td>
+                            <td class="p-4 border-b border-blue-gray-50">
+                                <p class="block font-sans text-sm antialiased font-normal leading-normal text-blue-gray-900">
+                                    {{ $user->username }}
+                                </p>
+                            </td>
+                            <td class="p-4 border-b border-blue-gray-50">
+                                @if (auth()->user()->getFriendshipStatus($user) == 'accepted')
+                                    <p class="block font-sans text-sm antialiased font-normal leading-normal text-blue-gray-900">
+                                        Friend
+                                    </p>
+                                @else
+                                    <a href="#" class="block font-sans text-sm antialiased font-medium leading-normal text-blue-gray-900 hover:underline">
+                                        Add Friends
+                                    </a>
+                                @endif
+                            </td>
+                        </tr>
+                    @endif
                 @endforeach
             </tbody>
         </table>
