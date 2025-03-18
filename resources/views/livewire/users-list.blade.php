@@ -27,7 +27,7 @@
                 <td class="p-4 border-b border-blue-gray-50">
                     <a class="block font-sans text-sm antialiased font-normal leading-normal 
          text-blue-gray-900 hover:text-blue-500"
-                        href="#">
+                        href="{{ route('user.show', $user['username']) }}">
                         {{ $user['username'] }}
                     </a>
 
