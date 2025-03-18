@@ -89,4 +89,15 @@ class User extends Authenticatable
         //merge the two collections
         return $this->sentFriendRequest->merge($this->receivedFriendRequest);
     }
+
+    /**
+     * Scope a query to search for users by name.
+     *
+     * @param \Illuminate\Database\Eloquent\Builder $query The query builder instance.
+     * @param string $term The search term to filter user names.
+     * @return \Illuminate\Database\Eloquent\Builder The modified query builder instance.
+     */
+    public function scopeSearch($query, $term){
+        return $query->where('name', 'LIKE', '%'.$term.'%');
+    }
 }
