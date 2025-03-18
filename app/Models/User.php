@@ -72,21 +72,21 @@ class User extends Authenticatable
         )->wherePivot('status', 'accepted');
     }
 
+    public function allAsArray(){
+        $users = User::all();
+        $usersData = [];
+        foreach($users as $user){
+            $usersData[$user->id] = [
+                'name' => $user->name,
+                'username' => $user->username,
+            ]; 
+        }
+        return $usersData;
+    }
+
     //get all the friends of a user
     public function getFriends(){
         //merge the two collections
         return $this->sentFriendRequest->merge($this->receivedFriendRequest);
-    }
-
-    //get friendship status
-    public function getFriendshipStatus($anotherUser){
-        $friendship = Friendship::where(function ($query) use ($anotherUser){
-            $query->where('sender_id', $this->id)->where('receiver_id', $anotherUser->id);
-        })->orWhere(function ($query) use($anotherUser){
-            $query->where('sender_id', $anotherUser->id)->where('receiver_id', $this->id);
-        })
-        ->first();
-
-        return $friendship ? $friendship->status : null;
     }
 }
