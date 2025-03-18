@@ -25,15 +25,20 @@
                     </p>
                 </td>
                 <td class="p-4 border-b border-blue-gray-50">
-                    <p class="block font-sans text-sm antialiased font-normal leading-normal text-blue-gray-900">
+                    <a class="block font-sans text-sm antialiased font-normal leading-normal 
+         text-blue-gray-900 hover:text-blue-500"
+                        href="#">
                         {{ $user['username'] }}
-                    </p>
+                    </a>
+
                 </td>
             </tr>
             @endforeach
         </tbody>
     </table>
     @else
-    User Not Found
+    <p class="block font-sans text-sm antialiased font-normal leading-normal text-blue-gray-900">
+        User Not Found
+    </p>
     @endif
 </div>

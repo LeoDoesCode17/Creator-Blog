@@ -4,14 +4,18 @@ namespace App\Livewire;
 
 use App\Models\User;
 use Livewire\Component;
+use Livewire\WithPagination;
 
 class UsersList extends Component
 {
 
+    use WithPagination;
+
     public $users = [];
 
     public function mount(){
-        $this->users = User::all()->toArray();
+        //Load paginated users
+        $this->users = User::all();
     }
 
     /**

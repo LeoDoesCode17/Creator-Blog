@@ -6,9 +6,11 @@ use App\Models\Friendship;
 use App\Models\User;
 use Livewire\Attributes\Title;
 use Livewire\Component;
+use Livewire\WithPagination;
 
 class SearchPage extends Component
 {
+    use WithPagination;
     #[Title('Search')]
 
     public $search = '';
@@ -24,7 +26,10 @@ class SearchPage extends Component
      * @return void
      */
     public function updatedSearch(){
+        //Paginate search result
         $users = User::search($this->search)->get();
+
+        //Dispatch paginated result
         $this->dispatch('searchUpdated', $users);
     }
 
