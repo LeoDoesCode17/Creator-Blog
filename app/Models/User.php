@@ -24,6 +24,8 @@ class User extends Authenticatable
         'email',
         'password',
         'username',
+        'avatar',
+        'soft_deleted'
     ];
 
     /**
