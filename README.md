@@ -5,7 +5,7 @@ Creator Blog is a project-based learning that i build during my 6th semester in 
 ## How You Use This In Your Local Machine
 
 ### 1. Clone this project 
-Using SSH   : `git clone git@github.com:LeoDoesCode17/Creator-Blog.git`
+Using SSH   : `git clone git@github.com:LeoDoesCode17/Creator-Blog.git`\n
 Using HTTPS : `git clone https://github.com/LeoDoesCode17/Creator-Blog.git`
 
 ### 2. Install all dependencies (PHP and JS)
