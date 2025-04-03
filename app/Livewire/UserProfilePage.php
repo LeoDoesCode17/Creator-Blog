@@ -2,7 +2,6 @@
 
 namespace App\Livewire;
 
-use App\Models\Friendship;
 use Livewire\Component;
 use App\Models\User;
 use Livewire\Attributes\Title;
@@ -14,7 +13,7 @@ class UserProfilePage extends Component
 
     public function mount($username){
         $this->user = User::where('username', $username)->firstOrFail();
-        $this->friendship = Friendship::getRelationship(auth()->user()->id, $this->user->id);
+        $this->friendship = auth()->user()->getFriendshipReceiverStatus($this->user->id);
     }
     public function render()
     {
