@@ -1,6 +1,6 @@
 ## About Creator Blog
 
-Creator Blog is a project-based learning that i build during my 6th semester in my college. This project purpose is to deeper my knowledge about Laravel Development. For the UIs, i'm using Alpine.JS and components from Tailwind UI.
+Creator Blog is a project-based learning initiative that I built during my 6th semester in college. The goal of this project is to deepen my knowledge of Laravel development. For the UI, I'm using Alpine.js and components from Tailwind UI.
 
 ## How You Use This In Your Local Machine
 
