@@ -4,8 +4,8 @@ namespace App\Enums;
 
 enum FriendshipStatus: string
 {
-    case Pending = 'pending';
-    case Accepted = 'accepted';
-    case Declined = 'declined';
-    case Blocked = 'blocked';
+    case PENDING = 'pending';
+    case ACCEPTED = 'accepted';
+    case DECLINED = 'declined';
+    case BLOCKED = 'blocked';
 }
