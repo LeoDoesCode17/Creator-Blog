@@ -11,22 +11,24 @@ class Friendship extends Model
     use HasFactory;
 
     protected $fillable = [
-        'user_id',
-        'friend_id',
-        'status'
+        'sender_id',
+        'receiver_id',
+        'status',
+        'created_at',
+        'updated_at'
     ];
 
     //to get the sender of a friendship
-    public function sender()
-    {
-        return $this->belongsTo(User::class, 'user_id');
-    }
+    // public function sender()
+    // {
+    //     return $this->belongsTo(User::class, 'user_id');
+    // }
 
-    //to get the receiver of a friendship
-    public function receiver()
-    {
-        return $this->belongsTo(User::class, 'friend_id');
-    }
+    // //to get the receiver of a friendship
+    // public function receiver()
+    // {
+    //     return $this->belongsTo(User::class, 'friend_id');
+    // }
 
     /**
      * Retrieve the relationship between two users based on their IDs.
