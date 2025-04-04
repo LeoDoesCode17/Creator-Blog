@@ -3,6 +3,8 @@
 namespace App\Livewire\Components;
 
 use Livewire\Component;
+use App\Enums\FriendshipStatus;
+use App\Models\Friendship;
 
 class FriendRequestButton extends Component
 {
@@ -13,8 +15,7 @@ class FriendRequestButton extends Component
         $label,
         $color,
         $action
-    )
-    {
+    ) {
         $this->user = $user;
         $this->label = $label;
         $this->color = $color;
@@ -24,12 +25,53 @@ class FriendRequestButton extends Component
     public function callAction()
     {
         //match the action to the method
-        match ($this->action){
+        match ($this->action) {
+            'add' => $this->addFriendRequest(),
             'accept' => $this->acceptFriendRequest(),
             'decline' => $this->declineFriendRequest(),
             'block' => $this->blockFriendRequest(),
             default => dd('Invalid action')
         };
+    }
+
+    private function addFriendRequest()
+    {
+        // dd(auth()->user()->id, $this->receiverId, FriendshipStatus::PENDING->value);
+        //create friend request
+        $authedUser = auth()->user();
+
+        //determine if the friendship request already exists
+        $friendshipRequest = $authedUser->getFriendshipReceiverStatus($this->user->id);
+
+        if ($friendshipRequest) {
+            $friendshipStatus = $friendshipRequest->status;
+            switch ($friendshipStatus) {
+                case FriendshipStatus::DECLINED->value:
+                    //get the friendship request and update the status to PENDING
+                    //this is the update code
+                    $friendshipRequest->update([
+                        'status' => FriendshipStatus::PENDING->value,
+                        'updated_at' => now(),
+                    ]);
+                    $this->dispatch('friendRequestCreated')->to('user-profile-page');;
+                    return;
+                default:
+                    return;
+            }
+        }
+        $friendship = Friendship::create([
+            'sender_id' => $authedUser->id,
+            'receiver_id' => $this->user->id,
+            'status' => FriendshipStatus::PENDING->value,
+            'created_at' => now(),
+            'updated_at' => now(),
+        ]);
+
+        if ($friendship) {
+            $this->dispatch('friendRequestCreated')->to('user-profile-page');
+        } else {
+            dd('Failed to create request');
+        }
     }
 
     private function acceptFriendRequest()
