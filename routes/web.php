@@ -33,38 +33,8 @@ Route::middleware('auth')->group(function () {
         return redirect()->route('login');
     })->name('logout');
     Route::get('/users/{username}', UserProfilePage::class)->name('user.show');
-
-    // TEST ROUTE
-    Route::get('/friendshipRequests', function () {
-        $friendshipRequests = auth()->user()->getFriendshipRequests();
-        return response()->json([
-            'code' => 200,
-            'message' => 'ok',
-            'data' => [
-                'friendshipRequests' => $friendshipRequests,
-            ]
-        ]);
-    });
-    // END TEST ROUTE
 });
 Route::middleware('guest')->group(function () {
     Route::get('/login', LoginPage::class)->name('login');
     Route::get('/register', RegisterPage::class)->name('register');
-});
-Route::get('/{id}/friends', function ($id) {
-    $friends = Friendship::where('status', 'accepted')
-        ->where(
-            function ($query) use ($id) {
-                $query->where('user_id', $id)->orWhere('friend_id', $id);
-            }
-        )
-        ->with(['sender', 'receiver'])
-        ->get()
-        ->map(function ($friendship) use ($id) {
-            return $friendship->user_id == $id ? $friendship->receiver : $friendship->sender;
-        });
-
-    return response()->json([
-        'friends' => $friends,
-    ]);
 });
