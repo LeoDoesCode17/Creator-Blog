@@ -5,6 +5,7 @@ namespace App\Livewire;
 use App\Models\Friendship;
 use Livewire\Component;
 use App\Models\User;
+use App\Repositories\Contracts\FriendshipRepositoryInterface;
 use Illuminate\Support\Facades\Auth;
 use Livewire\Attributes\Title;
 use Livewire\WithPagination;
@@ -30,12 +31,15 @@ class UserProfilePage extends Component
         $this->resetPage();
     }
 
-    public function render()
+    public function render(FriendshipRepositoryInterface $friendshipRepository)
     {
         $authedUser = Auth::user();
 
         //get the friendship request relationship(sender and receiver) between the authed user and visited user
-        $friendshipRequest = Friendship::between($authedUser, $this->user);
+        // $friendshipRequest = Friendship::between($authedUser, $this->user);
+
+        //using friendship repository
+        $friendshipRequest = $friendshipRepository->between($authedUser, $this->user);
 
         return view('livewire.user-profile-page', [
             'friendship' => $friendshipRequest->data,
