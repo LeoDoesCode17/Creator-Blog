@@ -2,8 +2,10 @@
 
 namespace App\Repositories\Eloquent;
 
+use App\Models\Friendship;
 use App\Models\User;
 use App\Repositories\Contracts\FriendshipRepositoryInterface;
+use App\Enums\FriendshipStatus;
 
 class FriendshipRepository implements FriendshipRepositoryInterface
 {
@@ -20,4 +22,28 @@ class FriendshipRepository implements FriendshipRepositoryInterface
             'isSender' => $authedAsSender ? true : ($authedAsReceiver ? false : null),
         ];
     }   
+
+    public function upsertFriendshipRequest(User $authedUser, User $receiverUser)
+    {
+        $friendshipRequest = $authedUser->getFriendshipReceiverStatus($receiverUser->id);
+
+        //check if the friendshipRequest already exists
+        if ($friendshipRequest) {
+            if ($friendshipRequest->status == FriendshipStatus::DECLINED->value) {
+                $friendshipRequest->update([
+                    'status' => FriendshipStatus::PENDING->value,
+                    'updated_at' => now(),
+                ]);
+            }
+            return $friendshipRequest; // always return object (even if not updated)
+        }
+
+        return Friendship::create([
+            'sender_id' => $authedUser->id,
+            'receiver_id' => $receiverUser->id,
+            'status' => FriendshipStatus::PENDING->value,
+            'created_at' => now(),
+            'updated_at' => now(),
+        ]);
+    }
 }
