@@ -75,4 +75,19 @@ class Friendship extends Model
             'updated_at' => now(),
         ]);
     }
+
+    //function to get information about friendship request between authed user and visitedUser and information about whether the authed user is the sender or receiver of the friendship request
+    public static function between(User $authedUser, User $visitedUser)
+    {
+        $authedAsSender = $authedUser->getFriendshipReceiverStatus($visitedUser->id);
+        $authedAsReceiver = $visitedUser->getFriendshipReceiverStatus($authedUser->id);
+
+        //data means the frienship request model
+        return (object)[
+            // if authedAsSender not null then store it in data else store authedAsReceiver in data
+            'data' => $authedAsSender ?? $authedAsReceiver,
+            // if authedAsSender not null then authed user is sender if authedAsReceiver not null authed user is receiver else null
+            'isSender' => $authedAsSender ? true : ($authedAsReceiver ? false : null),
+        ];
+    }
 }
