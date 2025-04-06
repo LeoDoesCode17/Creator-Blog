@@ -9,6 +9,7 @@ use App\Enums\FriendshipStatus;
 
 class FriendshipRepository implements FriendshipRepositoryInterface
 {
+    //function to get information about friendship request between authed user and visitedUser and information about whether the authed user is the sender or receiver of the friendship request
     public function between(User $authedUser, User $visitedUser)
     {
         $authedAsSender = $authedUser->getFriendshipReceiverStatus($visitedUser->id);
@@ -21,7 +22,7 @@ class FriendshipRepository implements FriendshipRepositoryInterface
             // if authedAsSender not null then authed user is sender if authedAsReceiver not null authed user is receiver else null
             'isSender' => $authedAsSender ? true : ($authedAsReceiver ? false : null),
         ];
-    }   
+    }
 
     public function upsertFriendshipRequest(User $authedUser, User $receiverUser)
     {
