@@ -2,6 +2,7 @@
 
 namespace App\Livewire;
 
+use App\Models\Friendship;
 use Livewire\Component;
 use App\Models\User;
 use Illuminate\Support\Facades\Auth;
@@ -33,25 +34,12 @@ class UserProfilePage extends Component
     {
         $authedUser = Auth::user();
 
-        //check if the authed user is the sender of the friendship request
-        $friendshipAsSender =  $authedUser->getFriendshipReceiverStatus($this->user->id);
+        //get the friendship request relationship(sender and receiver) between the authed user and visited user
+        $friendshipRequest = Friendship::between($authedUser, $this->user);
 
-        //check if the authed user is the receiver of the friendship request
-        $friendshipAsReceiver = $this->user->getFriendshipReceiverStatus($authedUser->id);
-
-        if ($friendshipAsSender){
-            $relationship = $friendshipAsSender;
-            $isSender = true;
-        }else if ($friendshipAsReceiver){
-            $relationship = $friendshipAsReceiver;
-            $isSender = false;
-        }else{
-            $relationship = null;
-            $isSender = null;
-        }
         return view('livewire.user-profile-page', [
-            'friendship' => $relationship,
-            'isSender' => $isSender,
+            'friendship' => $friendshipRequest->data,
+            'isSender' => $friendshipRequest->isSender,
         ]);
     }
 }
