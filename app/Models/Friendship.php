@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use App\Enums\FriendshipStatus;
 
 class Friendship extends Model
 {
@@ -41,13 +42,37 @@ class Friendship extends Model
      * @param int $receiver_id The ID of the receiver.
      * @return \App\Models\Friendship|null The friendship relationship if found, or null if not found.
      */
-    public static function getRelationship($sender_id, $receiver_id) 
+    public static function getRelationship($sender_id, $receiver_id)
     {
         //this is using query builder
-        return self::where(function($query) use ($sender_id, $receiver_id){
+        return self::where(function ($query) use ($sender_id, $receiver_id) {
             $query->where('sender_id', $sender_id)->where('receiver_id', $receiver_id);
-        })->orWhere(function($query) use($sender_id, $receiver_id){
+        })->orWhere(function ($query) use ($sender_id, $receiver_id) {
             $query->where('sender_id', $receiver_id)->where('receiver_id', $sender_id);
         })->first();
+    }
+
+    public static function createOrUpdateFriendshipRequest(User $authedUser, User $receiverUser)
+    {
+        $friendshipRequest = $authedUser->getFriendshipReceiverStatus($receiverUser->id);
+
+        //check if the friendshipRequest already exists
+        if ($friendshipRequest) {
+            if ($friendshipRequest->status == FriendshipStatus::DECLINED->value) {
+                $friendshipRequest->update([
+                    'status' => FriendshipStatus::PENDING->value,
+                    'updated_at' => now(),
+                ]);
+            }
+            return $friendshipRequest; // always return object (even if not updated)
+        }
+
+        return self::create([
+            'sender_id' => $authedUser->id,
+            'receiver_id' => $receiverUser->id,
+            'status' => FriendshipStatus::PENDING->value,
+            'created_at' => now(),
+            'updated_at' => now(),
+        ]);
     }
 }
