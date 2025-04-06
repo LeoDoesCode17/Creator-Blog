@@ -13,11 +13,13 @@ class RepositoryServiceProvider extends ServiceProvider
      */
     public function register(): void
     {
-        //
+        //friendship repository
         $this->app->bind(
             FriendshipRepositoryInterface::class,
             FriendshipRepository::class
         );
+
+        //add more for others repositories like friendship repository
     }
 
     /**
