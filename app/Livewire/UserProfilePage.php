@@ -4,6 +4,7 @@ namespace App\Livewire;
 
 use Livewire\Component;
 use App\Models\User;
+use Illuminate\Support\Facades\Auth;
 use Livewire\Attributes\Title;
 use Livewire\WithPagination;
 
@@ -30,7 +31,7 @@ class UserProfilePage extends Component
 
     public function render()
     {
-        $authedUser = auth()->user();
+        $authedUser = Auth::user();
 
         //check if the authed user is the sender of the friendship request
         $friendshipAsSender =  $authedUser->getFriendshipReceiverStatus($this->user->id);
