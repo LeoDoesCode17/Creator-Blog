@@ -4,11 +4,30 @@ namespace App\Livewire\Components;
 
 use Livewire\Component;
 use App\Models\Friendship;
+use App\Repositories\Contracts\FriendshipRepositoryInterface;
 use Illuminate\Support\Facades\Auth;
 
 class FriendRequestButton extends Component
 {
     public $user, $label, $color, $action;
+
+    //this is must use protected/private modifier
+    private FriendshipRepositoryInterface $friendshipRepository;
+
+    //solution to constructor injection problem of livewire
+    public function boot(FriendshipRepositoryInterface $friendshipRepository)
+    {
+        //this method is called when the component is instantiated
+        $this->friendshipRepository = $friendshipRepository;
+    }
+    //make the constructor to inject the friendship repository 
+    // this way doesn't work because livewire instantiate component using new Static(), so livewire doesn't know that there is a parameter that must be injected ($friendshipRepository)
+    // public function __construct($id=null, FriendshipRepositoryInterface $friendshipRepository)
+    // {
+    //     parent::__construct($id);
+    //     $this->friendshipRepository = $friendshipRepository;
+    // }
+    //solution of make the $friendshipRepository as a public property : using boot method
 
     public function mount(
         $user,
@@ -34,50 +53,11 @@ class FriendRequestButton extends Component
         };
     }
 
-    // private function addFriendRequest()
-    // {
-    //     // dd(auth()->user()->id, $this->receiverId, FriendshipStatus::PENDING->value);
-    //     //create friend request
-    //     $authedUser = auth()->user();
-
-    //     //determine if the friendship request already exists
-    //     $friendshipRequest = $authedUser->getFriendshipReceiverStatus($this->user->id);
-
-    //     if ($friendshipRequest) {
-    //         $friendshipStatus = $friendshipRequest->status;
-    //         switch ($friendshipStatus) {
-    //             case FriendshipStatus::DECLINED->value:
-    //                 //get the friendship request and update the status to PENDING
-    //                 //this is the update code
-    //                 $friendshipRequest->update([
-    //                     'status' => FriendshipStatus::PENDING->value,
-    //                     'updated_at' => now(),
-    //                 ]);
-    //                 $this->dispatch('friendRequestCreated')->to('user-profile-page');;
-    //                 return;
-    //             default:
-    //                 return;
-    //         }
-    //     }
-    //     $friendship = Friendship::create([
-    //         'sender_id' => $authedUser->id,
-    //         'receiver_id' => $this->user->id,
-    //         'status' => FriendshipStatus::PENDING->value,
-    //         'created_at' => now(),
-    //         'updated_at' => now(),
-    //     ]);
-
-    //     if ($friendship) {
-    //         $this->dispatch('friendRequestCreated')->to('user-profile-page');
-    //     } else {
-    //         dd('Failed to create request');
-    //     }
-    // }
-
     private function addFriendRequest()
     {
         $authedUser = Auth::user();
-        $friendshipRequest = Friendship::createOrUpdateFriendshipRequest($authedUser, $this->user);
+        // $friendshipRequest = Friendship::createOrUpdateFriendshipRequest($authedUser, $this->user);
+        $friendshipRequest = $this->friendshipRepository->upsertFriendshipRequest($authedUser, $this->user);
         if ($friendshipRequest->wasRecentlyCreated || $friendshipRequest->wasChanged()) {
             $this->dispatch('friendRequestCreated')->to('user-profile-page');
         } else {
