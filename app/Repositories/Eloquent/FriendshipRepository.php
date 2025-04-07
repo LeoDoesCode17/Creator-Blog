@@ -85,17 +85,23 @@ class FriendshipRepository implements FriendshipRepositoryInterface
     /**
      * Update the friendship request status sent by the target user to the authenticated user.
      *
-     * This function is used when the authenticated user visits the profile page of a target user 
-     * (who has previously sent a friendship request to the authenticated user). 
-     * The authenticated user can then accept, decline, or block that request.
+     * This method is used when the authenticated user visits the profile page of a target user
+     * who has previously sent a friendship request. The authenticated user (as the receiver)
+     * can respond to that request by accepting, declining, or blocking it.
      *
-     * @param User $authedUser   The authenticated user (receiver of the friendship request)
-     * @param User $targetUser   The target user (sender of the friendship request)
-     * @param string $status     The new status to be updated (e.g., accepted, declined, blocked)
+     * Flow:
+     * - Search for a friendship request where the sender is the target user
+     *   and the receiver is the authenticated user.
+     * - If found, update its status to the provided value.
+     * - If not found, throw FriendshipNotFoundException.
      *
-     * @throws FriendshipNotFoundException If no friendship request exists from target user to authenticated user.
+     * @param User   $authedUser  The authenticated user (receiver of the friendship request).
+     * @param User   $targetUser  The target user (sender of the friendship request).
+     * @param string $status      The new status to be set (e.g., accepted, declined, blocked).
      *
-     * @return bool True if the update is successful, false otherwise.
+     * @throws FriendshipNotFoundException  If the friendship request from target user to authenticated user does not exist.
+     *
+     * @return Friendship  The updated Friendship model.
      */
     private function updateFriendshipRequest(User $authedUser, User $targetUser, $status)
     {
@@ -105,9 +111,11 @@ class FriendshipRepository implements FriendshipRepositoryInterface
             throw new FriendshipNotFoundException();
         }
 
-        return $friendshipRequest->update([
+        $friendshipRequest->update([
             'status' => $status,
         ]);
+
+        return $friendshipRequest;
     }
 
     public function acceptFriendshipRequest(User $authedUser, User $targetUser)
