@@ -10,78 +10,121 @@ use App\Exceptions\FriendshipNotFoundException;
 
 class FriendshipRepository implements FriendshipRepositoryInterface
 {
-    //function to get information about friendship request between authed user and visitedUser and information about whether the authed user is the sender or receiver of the friendship request
-    public function between(User $authedUser, User $visitedUser)
+    /**
+     * Get information about the friendship request between the authenticated user and the visited user.
+     *
+     * This function checks if there is any friendship request between the authenticated user and 
+     * the visited user, regardless of who is the sender or receiver.
+     *
+     * It returns an object containing:
+     * - `friendship` → The friendship request model (if exists), or null if not found.
+     * - `isSender` → A boolean indicating whether the authenticated user is the sender:
+     *      - true  → if authenticated user sent the request.
+     *      - false → if authenticated user received the request.
+     *      - null  → if there is no friendship request between them.
+     *
+     * @param User $authedUser   The authenticated user who is visiting the profile.
+     * @param User $visitedUser  The visited user whose profile is being viewed.
+     *
+     * @return object {
+     *     friendship: Friendship|null,
+     *     isSender: bool|null
+     * }
+     */
+    public function getFriendshipBetween(User $authedUser, User $visitedUser)
     {
         $authedAsSender = $authedUser->getFriendshipReceiverStatus($visitedUser->id);
         $authedAsReceiver = $visitedUser->getFriendshipReceiverStatus($authedUser->id);
-
-        //data means the frienship request model
         return (object)[
-            // if authedAsSender not null then store it in friendship else store authedAsReceiver in friendship
             'friendship' => $authedAsSender ?? $authedAsReceiver,
-            // if authedAsSender not null then authed user is sender if authedAsReceiver not null authed user is receiver else null
             'isSender' => $authedAsSender ? true : ($authedAsReceiver ? false : null),
         ];
     }
 
-    //this is still bug because if 1->3 exists and 3->1 doesn't, this function will create 3->1 request
-    public function upsertFriendshipRequest(User $authedUser, User $receiverUser)
+    /**
+     * Upsert (create or update) a friendship request between two users.
+     *
+     * Flow logic:
+     * - If there is no existing friendship request between $authedUser and $visitedUser → create a new request (PENDING status).
+     * - If there is an existing friendship request with DECLINED status → update it to:
+     *      - sender_id: $authedUser
+     *      - receiver_id: $visitedUser
+     *      - status: PENDING
+     * - If there is an existing friendship request (other than DECLINED) → do nothing (just return it).
+     *
+     * @param User $authedUser  The authenticated user (request sender).
+     * @param User $visitedUser The target user (request receiver).
+     *
+     * @return Friendship The created or existing Friendship model instance.
+     */
+    public function upsertFriendshipRequest(User $authedUser, User $visitedUser)
     {
-        //this is must be in two direction
-        $friendshipRequest = $authedUser->getFriendshipReceiverStatus($receiverUser->id);
+        $betweenAuthedAndVisited = $this->getFriendshipBetween($authedUser, $visitedUser);
+        $friendshipRequest = $betweenAuthedAndVisited->friendship;
 
-        //check if the friendshipRequest already exists
-        if ($friendshipRequest) {
-            if ($friendshipRequest->status == FriendshipStatus::DECLINED->value) {
-                $friendshipRequest->update([
-                    'status' => FriendshipStatus::PENDING->value,
-                    'updated_at' => now(),
-                ]);
-            }
-            return $friendshipRequest; // always return object (even if not updated)
+        if (!$friendshipRequest) {
+            return Friendship::create([
+                'sender_id' => $authedUser->id,
+                'receiver_id' => $visitedUser->id,
+                'status' => FriendshipStatus::PENDING->value,
+                'created_at' => now(),
+                'updated_at' => now(),
+            ]);
         }
 
-        return Friendship::create([
-            'sender_id' => $authedUser->id,
-            'receiver_id' => $receiverUser->id,
-            'status' => FriendshipStatus::PENDING->value,
-            'created_at' => now(),
-            'updated_at' => now(),
-        ]);
+        if ($friendshipRequest->status == FriendshipStatus::DECLINED->value) {
+            $friendshipRequest->update([
+                'sender_id' => $authedUser->id,
+                'receiver_id' => $visitedUser->id,
+                'status' => FriendshipStatus::PENDING->value,
+            ]);
+        }
+        return $friendshipRequest; // always return object (even if not updated)
     }
 
+    /**
+     * Update the friendship request status sent by the target user to the authenticated user.
+     *
+     * This function is used when the authenticated user visits the profile page of a target user 
+     * (who has previously sent a friendship request to the authenticated user). 
+     * The authenticated user can then accept, decline, or block that request.
+     *
+     * @param User $authedUser   The authenticated user (receiver of the friendship request)
+     * @param User $targetUser   The target user (sender of the friendship request)
+     * @param string $status     The new status to be updated (e.g., accepted, declined, blocked)
+     *
+     * @throws FriendshipNotFoundException If no friendship request exists from target user to authenticated user.
+     *
+     * @return bool True if the update is successful, false otherwise.
+     */
     private function updateFriendshipRequest(User $authedUser, User $targetUser, $status)
     {
         $friendshipRequest = $targetUser->getFriendshipReceiverStatus($authedUser->id);
 
         if (!$friendshipRequest) {
-            dd($friendshipRequest);
             throw new FriendshipNotFoundException();
         }
 
-        $friendshipRequest->update([
+        return $friendshipRequest->update([
             'status' => $status,
-            'updated_at' => now(),
         ]);
-        return $friendshipRequest;
     }
 
     public function acceptFriendshipRequest(User $authedUser, User $targetUser)
     {
         // dd('Accept friend request from ' . $targetUser->name);  
-        return $this->updateFriendshipRequest($authedUser, $targetUser, FriendshipStatus::ACCEPTED->value); 
+        return $this->updateFriendshipRequest($authedUser, $targetUser, FriendshipStatus::ACCEPTED->value);
     }
 
     public function declineFriendshipRequest(User $authedUser, User $targetUser)
     {
         // dd('Decline friend request from ' . $targetUser->name);
-        return $this->updateFriendshipRequest($authedUser, $targetUser, FriendshipStatus::DECLINED->value); 
+        return $this->updateFriendshipRequest($authedUser, $targetUser, FriendshipStatus::DECLINED->value);
     }
 
     public function blockFriendshipRequest(User $authedUser, User $targetUser)
     {
         // dd('Block friend request from ' . $targetUser->name);
-        return $this->updateFriendshipRequest($authedUser, $targetUser, FriendshipStatus::BLOCKED->value); 
+        return $this->updateFriendshipRequest($authedUser, $targetUser, FriendshipStatus::BLOCKED->value);
     }
 }
