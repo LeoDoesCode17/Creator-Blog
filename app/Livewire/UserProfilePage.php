@@ -40,7 +40,7 @@ class UserProfilePage extends Component
         // $friendshipRequest = Friendship::between($authedUser, $this->user);
 
         //using friendship repository
-        $friendshipRequest = $friendshipRepository->between($authedUser, $this->user);
+        $friendshipRequest = $friendshipRepository->getFriendshipBetween($authedUser, $this->user);
 
         return view('livewire.user-profile-page', [
             'friendship' => $friendshipRequest->friendship,
