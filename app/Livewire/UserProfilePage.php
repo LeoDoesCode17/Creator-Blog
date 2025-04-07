@@ -18,7 +18,8 @@ class UserProfilePage extends Component
     public $user;
 
     protected $listeners = [
-        'friendRequestCreated' => 'updateFriendshipReceiverStatus'
+        'friendshipRequestCreated' => 'updateFriendshipReceiverStatus',
+        'friendshipRequestUpdated' => 'updateFriendshipReceiverStatus',
     ];
 
     public function mount($username)
@@ -42,7 +43,7 @@ class UserProfilePage extends Component
         $friendshipRequest = $friendshipRepository->between($authedUser, $this->user);
 
         return view('livewire.user-profile-page', [
-            'friendship' => $friendshipRequest->data,
+            'friendship' => $friendshipRequest->friendship,
             'isSender' => $friendshipRequest->isSender,
         ]);
     }
