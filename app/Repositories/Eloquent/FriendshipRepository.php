@@ -6,6 +6,7 @@ use App\Models\Friendship;
 use App\Models\User;
 use App\Repositories\Contracts\FriendshipRepositoryInterface;
 use App\Enums\FriendshipStatus;
+use App\Exceptions\FriendshipNotFoundException;
 
 class FriendshipRepository implements FriendshipRepositoryInterface
 {
@@ -17,15 +18,17 @@ class FriendshipRepository implements FriendshipRepositoryInterface
 
         //data means the frienship request model
         return (object)[
-            // if authedAsSender not null then store it in data else store authedAsReceiver in data
-            'data' => $authedAsSender ?? $authedAsReceiver,
+            // if authedAsSender not null then store it in friendship else store authedAsReceiver in friendship
+            'friendship' => $authedAsSender ?? $authedAsReceiver,
             // if authedAsSender not null then authed user is sender if authedAsReceiver not null authed user is receiver else null
             'isSender' => $authedAsSender ? true : ($authedAsReceiver ? false : null),
         ];
     }
 
+    //this is still bug because if 1->3 exists and 3->1 doesn't, this function will create 3->1 request
     public function upsertFriendshipRequest(User $authedUser, User $receiverUser)
     {
+        //this is must be in two direction
         $friendshipRequest = $authedUser->getFriendshipReceiverStatus($receiverUser->id);
 
         //check if the friendshipRequest already exists
@@ -46,5 +49,39 @@ class FriendshipRepository implements FriendshipRepositoryInterface
             'created_at' => now(),
             'updated_at' => now(),
         ]);
+    }
+
+    private function updateFriendshipRequest(User $authedUser, User $targetUser, $status)
+    {
+        $friendshipRequest = $targetUser->getFriendshipReceiverStatus($authedUser->id);
+
+        if (!$friendshipRequest) {
+            dd($friendshipRequest);
+            throw new FriendshipNotFoundException();
+        }
+
+        $friendshipRequest->update([
+            'status' => $status,
+            'updated_at' => now(),
+        ]);
+        return $friendshipRequest;
+    }
+
+    public function acceptFriendshipRequest(User $authedUser, User $targetUser)
+    {
+        // dd('Accept friend request from ' . $targetUser->name);  
+        return $this->updateFriendshipRequest($authedUser, $targetUser, FriendshipStatus::ACCEPTED->value); 
+    }
+
+    public function declineFriendshipRequest(User $authedUser, User $targetUser)
+    {
+        // dd('Decline friend request from ' . $targetUser->name);
+        return $this->updateFriendshipRequest($authedUser, $targetUser, FriendshipStatus::DECLINED->value); 
+    }
+
+    public function blockFriendshipRequest(User $authedUser, User $targetUser)
+    {
+        // dd('Block friend request from ' . $targetUser->name);
+        return $this->updateFriendshipRequest($authedUser, $targetUser, FriendshipStatus::BLOCKED->value); 
     }
 }
