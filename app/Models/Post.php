@@ -15,6 +15,6 @@ class Post extends Model
         'content',
         'cover',
         'author_id',
-        'category',
+        'category_id',
     ];
 }
