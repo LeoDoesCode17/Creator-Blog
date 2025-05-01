@@ -16,5 +16,6 @@ class Post extends Model
         'cover',
         'author_id',
         'category_id',
+        'soft_deleted',
     ];
 }

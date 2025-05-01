@@ -18,6 +18,7 @@ return new class extends Migration
             $table->string('cover'); //this is for image cover
             $table->foreignId('author_id')->constrained('users')->onDelete('cascade'); //this is for author id
             $table->foreignId('category_id')->constrained('categories')->onDelete('cascade'); //this is for category id
+            $table->boolean('soft_deleted')->default(false);
             $table->timestamps();
         });
     }
