@@ -3,16 +3,19 @@
 namespace App\Models;
 
 // use Illuminate\Contracts\Auth\MustVerifyEmail;
+
+use App\Enums\FriendshipStatus;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
+use Laravel\Sanctum\HasApiTokens;
 use PDO;
 
 class User extends Authenticatable
 {
     /** @use HasFactory<\Database\Factories\UserFactory> */
-    use HasFactory, Notifiable;
+    use HasFactory, Notifiable, HasApiTokens;
 
     /**
      * The attributes that are mass assignable.
@@ -54,7 +57,8 @@ class User extends Authenticatable
     //define many to many relationship with User model where the relational table is Friendship table
 
     //the user is the sender of the friendship request
-    public function sentFriendRequest(): BelongsToMany {
+    public function sentFriendRequest(): BelongsToMany
+    {
         //this is a join operation
         return $this->belongsToMany(
             User::class,
@@ -65,7 +69,8 @@ class User extends Authenticatable
     }
 
     //the user is the receiver of another users friendship request
-    public function receivedFriendRequest(): BelongsToMany {
+    public function receivedFriendRequest(): BelongsToMany
+    {
         return $this->belongsToMany(
             User::class,
             'friendships',
@@ -74,20 +79,22 @@ class User extends Authenticatable
         )->wherePivot('status', 'accepted');
     }
 
-    public function allAsArray(){
+    public function allAsArray()
+    {
         $users = User::all();
         $usersData = [];
-        foreach($users as $user){
+        foreach ($users as $user) {
             $usersData[$user->id] = [
                 'name' => $user->name,
                 'username' => $user->username,
-            ]; 
+            ];
         }
         return $usersData;
     }
 
     //get all the friends of a user
-    public function getFriends(){
+    public function getFriends()
+    {
         //merge the two collections
         return $this->sentFriendRequest->merge($this->receivedFriendRequest);
     }
@@ -99,7 +106,21 @@ class User extends Authenticatable
      * @param string $term The search term to filter user names.
      * @return \Illuminate\Database\Eloquent\Builder The modified query builder instance.
      */
-    public function scopeSearch($query, $term){
-        return $query->where('name', 'LIKE', '%'.$term.'%');
+    public function scopeSearch($query, $term)
+    {
+        return $query->where('name', 'LIKE', '%' . $term . '%');
+    }
+
+    public function getFriendshipReceiverStatus($receiverId)
+    {
+        return Friendship::where('sender_id', $this->id)
+            ->where('receiver_id', $receiverId)->first();
+    }
+
+    public function getFriendshipRequests()
+    {
+        return Friendship::where('receiver_id', $this->id)
+            ->where('status', FriendshipStatus::PENDING->value)
+            ->get();
     }
 }
