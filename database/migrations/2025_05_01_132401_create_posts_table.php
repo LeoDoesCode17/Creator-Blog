@@ -14,7 +14,7 @@ return new class extends Migration
         Schema::create('posts', function (Blueprint $table) {
             $table->id();
             $table->string('title'); //this is for title
-            $table->string('content'); //this is for body
+            $table->text('content'); //this is for body
             $table->string('cover'); //this is for image cover
             $table->foreignId('author_id')->constrained('users')->onDelete('cascade'); //this is for author id
             $table->foreignId('category_id')->constrained('categories')->onDelete('cascade'); //this is for category id
