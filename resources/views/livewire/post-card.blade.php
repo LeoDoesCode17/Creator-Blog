@@ -1,4 +1,4 @@
-<article class="flex max-w-xl flex-col items-start justify-between">
+<article id="{{ $post->id }}" class="flex max-w-xl flex-col items-start justify-between">
     <!-- Cover Image -->
     <img src="{{ asset($post->cover) }}" alt="Cover Image" class="w-full rounded-lg object-cover max-h-64">
 
