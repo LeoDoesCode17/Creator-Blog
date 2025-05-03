@@ -3,7 +3,7 @@
 namespace App\Providers;
 
 use App\Repositories\Contracts\FriendshipRepositoryInterface;
-use App\Repositories\Contracts\PostRepository;
+use App\Repositories\Eloquent\PostRepository;
 use App\Repositories\Contracts\PostRepositoryInterface;
 use App\Repositories\Eloquent\FriendshipRepository;
 use Illuminate\Support\ServiceProvider;
