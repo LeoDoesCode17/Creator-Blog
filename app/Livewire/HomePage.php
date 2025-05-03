@@ -2,16 +2,21 @@
 
 namespace App\Livewire;
 
-use App\Models\Post;
+use App\Repositories\Contracts\PostRepositoryInterface;
 use Livewire\Attributes\Title;
 use Livewire\Component;
 
 class HomePage extends Component
 {
     #[Title('Home')]
+    private $postRepository;
+    public function boot(PostRepositoryInterface $postRepository)
+    {
+        $this->postRepository = $postRepository;
+    }
     public function render()
     {
-        $posts = Post::latest()->with(['author', 'category'])->paginate(6); //perform eager loading to reduce the number of queries and paginate the results to 6 posts per page
+        $posts = $this->postRepository->getAllPosts(6, ['author', 'category']);
         return view('livewire.home-page', ['posts' => $posts]);
     }
 }
