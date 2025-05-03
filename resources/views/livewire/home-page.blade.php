@@ -10,4 +10,7 @@
             @endforeach
         </div>
     </div>
+    <div class="py-24">
+        {{  $posts->links() }}
+    </div>
 </div>
