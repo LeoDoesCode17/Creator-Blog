@@ -22,9 +22,9 @@ class PostFactory extends Factory
             'title' => fake()->words(3, true),
             'content' => fake()->paragraph(),
             'cover' => fake()->randomElement([
-                'storage/app/public/posts/cover1.jpg',
-                'storage/app/public/posts/cover2.jpg',
-                'storage/app/public/posts/cover3.jpg',
+                'storage/posts/cover1.jpg',
+                'storage/posts/cover2.jpg',
+                'storage/posts/cover3.jpg',
             ]),
             'author_id' => User::inRandomOrder()->first()->id,
             'category_id' => Category::inRandomOrder()->first()->id,
