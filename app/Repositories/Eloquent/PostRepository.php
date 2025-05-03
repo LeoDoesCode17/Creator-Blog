@@ -1,7 +1,8 @@
 <?php
 
-namespace App\Repositories\Contracts;
+namespace App\Repositories\Eloquent;
 use App\Models\Post;
+use App\Repositories\Contracts\PostRepositoryInterface;
 
 class PostRepository implements PostRepositoryInterface
 {
