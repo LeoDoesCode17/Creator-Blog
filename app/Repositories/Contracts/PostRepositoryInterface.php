@@ -10,4 +10,5 @@ interface PostRepositoryInterface
     public function updatePost($id, array $data);
     public function deletePost($id);
     public function getPostsByUser($userId, $perPage, $with);
+    public function getPostsByAuthors($authorIds, $perPage, $with);
 }

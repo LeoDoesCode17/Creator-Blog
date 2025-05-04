@@ -39,4 +39,12 @@ class PostRepository implements PostRepositoryInterface
     {
         return Post::where('author_id', $userId)->with($with)->latest()->paginate($perPage);
     }
+
+    public function getPostsByAuthors($authorIds, $perPage, $with)
+    {
+        return Post::whereIn('author_id', $authorIds)
+        ->with($with)
+        ->latest()
+        ->paginate($perPage);
+    }
 }
