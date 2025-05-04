@@ -14,4 +14,5 @@ interface FriendshipRepositoryInterface
     public function blockFriendshipRequest(User $authedUser, User $targetUser);
     public function getFriendship(User $user1, User $user2);
     public function getPendingFriendshipRequest(User $user);
+    public function getAcceptedFriendshipRequest(User $user);
 }

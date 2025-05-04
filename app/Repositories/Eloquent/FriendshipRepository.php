@@ -149,4 +149,14 @@ class FriendshipRepository implements FriendshipRepositoryInterface
         ->where('status', FriendshipStatus::PENDING->value)
         ->get();
     }
+
+    public function getAcceptedFriendshipRequest(User $authedUser)
+    {
+        return Friendship::where(function ($query) use ($authedUser) {
+            $query->where('receiver_id', $authedUser->id)
+                  ->orWhere('sender_id', $authedUser->id);
+        })
+        ->where('status', FriendshipStatus::ACCEPTED->value)
+        ->get();    
+    }
 }
