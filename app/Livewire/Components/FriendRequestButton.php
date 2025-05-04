@@ -4,10 +4,9 @@ namespace App\Livewire\Components;
 
 use App\Exceptions\FriendshipNotFoundException;
 use Livewire\Component;
-use App\Models\Friendship;
-use App\Repositories\Contracts\FriendshipRepositoryInterface;
 use Illuminate\Support\Facades\Auth;
 use App\Models\User;
+use App\Services\FriendshipService;
 
 class FriendRequestButton extends Component
 {
@@ -16,13 +15,13 @@ class FriendRequestButton extends Component
     public User $authedUser;
 
     //this is must use protected/private modifier
-    private FriendshipRepositoryInterface $friendshipRepository;
+    private FriendshipService $friendshipService;
 
     //solution to constructor injection problem of livewire
-    public function boot(FriendshipRepositoryInterface $friendshipRepository)
+    public function boot(FriendshipService $friendshipService)
     {
         //this method is called when the component is instantiated
-        $this->friendshipRepository = $friendshipRepository;
+        $this->friendshipService = $friendshipService;
         $this->authedUser = Auth::user();;
     }
     //make the constructor to inject the friendship repository 
@@ -60,8 +59,7 @@ class FriendRequestButton extends Component
 
     private function addFriendRequest()
     {
-        // $friendshipRequest = Friendship::createOrUpdateFriendshipRequest($authedUser, $this->user);
-        $friendshipRequest = $this->friendshipRepository->upsertFriendshipRequest($this->authedUser, $this->user);
+        $friendshipRequest = $this->friendshipService->addAsFriend($this->authedUser, $this->user);
         if ($friendshipRequest->wasRecentlyCreated || $friendshipRequest->wasChanged()) {
             $this->dispatch('friendshipRequestCreated')->to('user-profile-page');
         } else {
@@ -72,7 +70,7 @@ class FriendRequestButton extends Component
     private function acceptFriendRequest()
     {
         try{
-            $updatedFriendshipRequest = $this->friendshipRepository->acceptFriendshipRequest($this->authedUser, $this->user);
+            $updatedFriendshipRequest = $this->friendshipService->acceptFriendRequest($this->user, $this->authedUser);
             if ($updatedFriendshipRequest->wasChanged()) {
                 $this->dispatch('friendshipRequestUpdated')->to('user-profile-page');
             }else{
@@ -86,7 +84,7 @@ class FriendRequestButton extends Component
     private function declineFriendRequest()
     {
         try{
-            $updatedFriendshipRequest = $this->friendshipRepository->declineFriendshipRequest($this->authedUser, $this->user);
+            $updatedFriendshipRequest = $this->friendshipService->declineFriendRequest($this->user, $this->authedUser);
             if ($updatedFriendshipRequest->wasChanged()) {
                 $this->dispatch('friendshipRequestUpdated')->to('user-profile-page');
             }else{
@@ -100,7 +98,7 @@ class FriendRequestButton extends Component
     private function blockFriendRequest()
     {
         try{
-            $updatedFriendshipRequest = $this->friendshipRepository->blockFriendshipRequest($this->authedUser, $this->user);
+            $updatedFriendshipRequest = $this->friendshipService->blockFriendRequest($this->user, $this->authedUser);
             if ($updatedFriendshipRequest->wasChanged()) {
                 $this->dispatch('friendshipRequestUpdated')->to('user-profile-page');
             }else{

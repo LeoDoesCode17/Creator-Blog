@@ -7,6 +7,7 @@ use App\Models\User;
 use App\Repositories\Contracts\FriendshipRepositoryInterface;
 use App\Enums\FriendshipStatus;
 use App\Exceptions\FriendshipNotFoundException;
+use App\Repositories\Contracts\Friendship as ContractsFriendship;
 
 class FriendshipRepository implements FriendshipRepositoryInterface
 {
@@ -33,8 +34,8 @@ class FriendshipRepository implements FriendshipRepositoryInterface
      */
     public function getFriendshipBetween(User $authedUser, User $visitedUser)
     {
-        $authedAsSender = $authedUser->getFriendshipReceiverStatus($visitedUser->id);
-        $authedAsReceiver = $visitedUser->getFriendshipReceiverStatus($authedUser->id);
+        $authedAsSender = $this->getFriendship($authedUser, $visitedUser);
+        $authedAsReceiver = $this->getFriendship($visitedUser, $authedUser);
         return (object)[
             'friendship' => $authedAsSender ?? $authedAsReceiver,
             'isSender' => $authedAsSender ? true : ($authedAsReceiver ? false : null),
@@ -105,7 +106,7 @@ class FriendshipRepository implements FriendshipRepositoryInterface
      */
     private function updateFriendshipRequest(User $authedUser, User $targetUser, $status)
     {
-        $friendshipRequest = $targetUser->getFriendshipReceiverStatus($authedUser->id);
+        $friendshipRequest = $this->getFriendship($targetUser, $authedUser);
 
         if (!$friendshipRequest) {
             throw new FriendshipNotFoundException();
@@ -134,5 +135,28 @@ class FriendshipRepository implements FriendshipRepositoryInterface
     {
         // dd('Block friend request from ' . $targetUser->name);
         return $this->updateFriendshipRequest($authedUser, $targetUser, FriendshipStatus::BLOCKED->value);
+    }
+
+    public function getFriendship(User $senderUser, User $receiverUser): ?Friendship
+    {
+        return Friendship::where('sender_id', $senderUser->id)
+        ->where('receiver_id', $receiverUser->id)->first();
+    }
+
+    public function getPendingFriendshipRequest(User $authedUser)
+    {
+        return Friendship::where('receiver_id', $authedUser->id)
+        ->where('status', FriendshipStatus::PENDING->value)
+        ->get();
+    }
+
+    public function getAcceptedFriendshipRequest(User $authedUser)
+    {
+        return Friendship::where(function ($query) use ($authedUser) {
+            $query->where('receiver_id', $authedUser->id)
+                  ->orWhere('sender_id', $authedUser->id);
+        })
+        ->where('status', FriendshipStatus::ACCEPTED->value)
+        ->get();    
     }
 }

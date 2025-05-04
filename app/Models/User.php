@@ -10,7 +10,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Laravel\Sanctum\HasApiTokens;
-use PDO;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class User extends Authenticatable
 {
@@ -54,49 +54,10 @@ class User extends Authenticatable
         ];
     }
 
-    //define many to many relationship with User model where the relational table is Friendship table
-
-    //the user is the sender of the friendship request
-    public function sentFriendRequest(): BelongsToMany
+    //relationship with posts table
+    public function posts():  HasMany 
     {
-        //this is a join operation
-        return $this->belongsToMany(
-            User::class,
-            'friendships',
-            'sender_id',
-            'receiver_id'
-        )->wherePivot('status', 'accepted');
-    }
-
-    //the user is the receiver of another users friendship request
-    public function receivedFriendRequest(): BelongsToMany
-    {
-        return $this->belongsToMany(
-            User::class,
-            'friendships',
-            'receiver_id',
-            'sender_id'
-        )->wherePivot('status', 'accepted');
-    }
-
-    public function allAsArray()
-    {
-        $users = User::all();
-        $usersData = [];
-        foreach ($users as $user) {
-            $usersData[$user->id] = [
-                'name' => $user->name,
-                'username' => $user->username,
-            ];
-        }
-        return $usersData;
-    }
-
-    //get all the friends of a user
-    public function getFriends()
-    {
-        //merge the two collections
-        return $this->sentFriendRequest->merge($this->receivedFriendRequest);
+        return $this->hasMany(Post::class);
     }
 
     /**
@@ -111,16 +72,4 @@ class User extends Authenticatable
         return $query->where('name', 'LIKE', '%' . $term . '%');
     }
 
-    public function getFriendshipReceiverStatus($receiverId)
-    {
-        return Friendship::where('sender_id', $this->id)
-            ->where('receiver_id', $receiverId)->first();
-    }
-
-    public function getFriendshipRequests()
-    {
-        return Friendship::where('receiver_id', $this->id)
-            ->where('status', FriendshipStatus::PENDING->value)
-            ->get();
-    }
 }
